@@ -175,6 +175,9 @@ func (is *int64Store) getValues(v interface{}) ([]interface{}, error) {
 	case int64:
 		is.setMinMax(typed)
 		vals = []interface{}{typed}
+	case uint64:
+		is.setMinMax(int64(typed))
+		vals = []interface{}{typed}
 	case []int64:
 		if is.repTyp != parquet.FieldRepetitionType_REPEATED {
 			return nil, errors.Errorf("the value is not repeated but it is an array")
@@ -182,6 +185,15 @@ func (is *int64Store) getValues(v interface{}) ([]interface{}, error) {
 		vals = make([]interface{}, len(typed))
 		for j := range typed {
 			is.setMinMax(typed[j])
+			vals[j] = typed[j]
+		}
+	case []uint64:
+		if is.repTyp != parquet.FieldRepetitionType_REPEATED {
+			return nil, errors.Errorf("the value is not repeated but it is an array")
+		}
+		vals = make([]interface{}, len(typed))
+		for j := range typed {
+			is.setMinMax(int64(typed[j]))
 			vals[j] = typed[j]
 		}
 	default:

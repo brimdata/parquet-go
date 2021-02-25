@@ -866,3 +866,36 @@ func TestReadWriteColumeEncodings(t *testing.T) {
 func strPtr(s string) *string {
 	return &s
 }
+
+func TestWriteThenReadFileUint(t *testing.T) {
+	sd, err := parquetschema.ParseSchemaDefinition(`
+		message foo {
+			required int32 u8 (UINT_8);
+			required int32 u16 (UINT_16);
+			required int32 u32 (UINT_32);
+			required int64 u64 (UINT_64);
+		}
+	`)
+	require.NoError(t, err)
+
+	var buf bytes.Buffer
+	w := NewFileWriter(&buf, WithSchemaDefinition(sd))
+	testData := map[string]interface{}{
+		"u8":  uint32(8),
+		"u16": uint32(16),
+		"u32": uint32(32),
+		"u64": uint64(64),
+	}
+	require.NoError(t, w.AddData(testData))
+	require.NoError(t, w.Close())
+
+	r, err := NewFileReader(bytes.NewReader(buf.Bytes()))
+	require.NoError(t, err)
+
+	data, err := r.NextRow()
+	require.NoError(t, err)
+	require.Equal(t, testData, data)
+
+	_, err = r.NextRow()
+	require.Equal(t, io.EOF, err)
+}

@@ -283,7 +283,7 @@ func encodeLevelsV2(w io.Writer, max uint16, values *packedArray) error {
 
 func mapKey(a interface{}) interface{} {
 	switch v := a.(type) {
-	case int, int32, int64, string, bool, float64, float32:
+	case int, int32, uint32, int64, uint64, string, bool, float64, float32:
 		return a
 	case []byte:
 		return DefaultHashFunc(v)
