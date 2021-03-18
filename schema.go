@@ -224,7 +224,7 @@ func (c *Column) getFirstRDLevel() (int32, int32, bool) {
 		}
 
 		// if this value is not nil, dLevel less than this level is not interesting
-		if dl == int32(c.children[i].maxD) {
+		if rl >= int32(c.children[i].maxR) || dl >= int32(c.children[i].maxD) {
 			return rl, dl, last
 		}
 	}
